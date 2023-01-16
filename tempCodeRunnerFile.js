@@ -1,20 +1,7 @@
-//params 가져오기
-// app.get('/:params', (req, res) => {
-//     console.log(req.params)
-// })
-
-// //header 가져오기
-// app.get('/header', (req, res) => {
-//     console.log(req.header)
-// })
-
-// //cookies 가져오기
-// app.get('/cookies', (req, res) => {
-//     console.log(req.cookies)
-// })
-
-// //body 가져오기
-// app.get('/body', (req, res) => {
-//     console.log(req.body)
-//     res.send(req.body)
-// })
+for (let i = 1; i <= 9; i++){
+    console.log('\n',i,'단')
+    for(let j = 1; j <= 9; j++){
+        let result = i * j
+        console.log(i ,'*', j , '=', result);
+    }  
+}
