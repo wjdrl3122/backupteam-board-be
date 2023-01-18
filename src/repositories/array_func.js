@@ -71,7 +71,12 @@ const users = [
     {id: 10,name: "Kaylee Jakoubec", email: "kjakoubec2i@epa.gov"}
 ]
 
+// 4-2 id 가 1번에 해당하는 user 가 작성한 영화 movie_title 로만 이루어진 배열을 가져온다.
+const movieTitle = movies.find(movie => movie.movie_title === 'Looney Tunes: Back in Action')
+const userEmail = users.find(user => user.id === movieTitle)
+console.log(movieTitle)
 // 4-1. 모든 movies 를 반환하는 개발을 한다. 단 movie 를 작성한 user 의 이름을 포함 해라
+
 // const movieUser = movies.map( movie => {
 //     const temp = users.find(element => element.id === movie.user_id)
 //     if(temp.name){
