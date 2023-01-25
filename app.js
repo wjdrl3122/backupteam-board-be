@@ -1,6 +1,9 @@
 const express = require('express');
+const cors = require('cors')
+
 const app = express();
 const cookieParser = require('cookie-parser');
+const e = require('express');
 
 const movies = [
     {id: 1, movie_title: "Misérables, Les", hit_count: 23, user_id: 1, created_at: "2022-08-11 00:40:32"},
@@ -37,45 +40,78 @@ const users = [
     {id: 10,name: "Kaylee Jakoubec", email: "kjakoubec2i@epa.gov"}
 ]
 
+app.use(cors())
 app.use(express.json());
 app.use(cookieParser());
 
 app.get('/movies', (req,res) => {
-    res.send(movies.map(movie => ({
-        ...movie,
-        name: users.find( user => user.id).name
-    })))
+    const page = req.query.page || 1
+    const cloneMovies = [...movies]
+    const lastPage = Math.ceil(movies.length / 10); // 2
+    const startIndex = (page - 1) * 10; // 0 10 20 30
+    const paginationMovies = cloneMovies.splice(startIndex,10);
+    
+
+    const movieList = paginationMovies.map(movie => ({
+      ...movie,
+      name: users.find( user => user.id).name
+  }))
+
+    // movieList.sort((a, b) => {
+    //   const prevTimestamp = new Date(a.created_at).getTime()
+    //   const curTimestamp = new Date(b.created_at).getTime()
+    //   return  curTimestamp - prevTimestamp 
+    // })
+    
+    
+
+    res.send({
+      pages : lastPage,
+      movies : movieList
+    })
 })
 // 1. 사용자가 등록할 영화의 정보를 주면 받아온다 from 요청 (req)
 // 2. 가져온 영화정보에 id 를 부여한다.
 // 3. 조회수 (hit_count) 는 기본으로 0으로 설정한다.
 // 4. 작성일은 현재 시각을 넣는다.
 // 3. 2,3,4 전부 부여된 영화정보를 movies 추가한다.
-app.post('/movies', ( req, res ) => {
-    
-    const CreateMovie = {
-        id : movies[movies.length -1].id + 1,
-        movie_title : req.body.movie_title,
-        hit_count : 0,
-        user_id : req.body.user_id,
-        created_at : new Date()
-    };
-    movies.push(CreateMovie);
+app.post("/movies", (req, res) => {
+    const { movie_title, user_id } = req.body;
+    // const id = movies.at(-1).id + 1;
+    // const hitCount = 0;
+    const date = new Date().toISOString().substring(0, 10);
+    const time = new Date().toISOString().substring(11, 19);
+    // const created_at = `${date} ${time}`;
+    movies.shift({
+      id: movies.at(-1).id + 1,
+      movie_title,
+      hit_count: 0,
+      user_id,
+      created_at: `${date} ${time}`,
+    });
+    return res.send(movies);
+  });
 
-    res.send(movies)
-})
+app.get("/movies/:id", (req, res) => {
+  const { id } = req.params
+  const findMovie = movies.find(movie => movie.id === Number(id))
+  // {
+  //   id: 3,
+  //   movie_title: 'Captain Ron',
+  //   hit_count: 1,
+  //   user_id: 1,
+  //   created_at: '2022-08-14 18:09:47'
+  // }
+  const editMovie = {
+    ...findMovie,
+    hit_count : findMovie.hit_count + 1
+  }
 
-app.get('/movies/:id', (req, res) => {
-    const { id } = req.params;
-    const findMovie = movies.filter(movie => movie.id == id )
-    const ObjectMovie = findMovie.find( movie => movie.id)
-    const findIndex = movies.findIndex( movie => movie.id == id)
-    ObjectMovie.hit_count += 1
-    
-    movies.splice(findIndex, 1, ObjectMovie)
-    
-    res.send(movies)
-})
+const findIndexMoive = movies.findIndex(movie => movie.id === Number(id))
+movies.splice(findIndexMoive, 1, editMovie)
+res.send(findMovie)
+
+  });
 // 1. 사용자가 보내준 id 를 가져온다
 // 2. id 에 해당하는 movie 를 가져온다
 // 3. 가져온 movie 에서 hit_count 1을 더한 객체를 만든다
