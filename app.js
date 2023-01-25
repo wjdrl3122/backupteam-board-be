@@ -57,11 +57,11 @@ app.get('/movies', (req,res) => {
       name: users.find( user => user.id).name
   }))
 
-    // movieList.sort((a, b) => {
-    //   const prevTimestamp = new Date(a.created_at).getTime()
-    //   const curTimestamp = new Date(b.created_at).getTime()
-    //   return  curTimestamp - prevTimestamp 
-    // })
+    movieList.sort((a, b) => {
+      const prevTimestamp = new Date(a.created_at).getTime()
+      const curTimestamp = new Date(b.created_at).getTime()
+      return  curTimestamp - prevTimestamp 
+    })
     
     
 
